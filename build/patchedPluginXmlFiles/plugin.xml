@@ -1,0 +1,15 @@
+<idea-plugin>
+  <version>0.0.1</version>
+  <idea-version since-build="233.11799" until-build="233.*" />
+  <id>com.localblocks.plugin</id>
+  <name>Local Blocks</name>
+  <vendor>Local</vendor>
+  <actions>
+    <action id="LocalBlocks.AddBlock" class="com.localblocks.actions.AddBlockAction" text="Add Block" description="Add a reusable code block">
+      <add-to-group group-id="ToolsMenu" anchor="last" />
+    </action>
+    <action id="LocalBlocks.InsertBlock" class="com.localblocks.actions.InsertBlockAction" text="Insert Block" description="Insert a saved code block">
+      <add-to-group group-id="ToolsMenu" anchor="last" />
+    </action>
+  </actions>
+</idea-plugin>

@@ -1,0 +1,14 @@
+<idea-plugin>
+    <id>com.localblocks.plugin</id>
+    <name>Local Blocks</name>
+    <vendor>Local</vendor>
+
+    <actions>
+        <action id="LocalBlocks.AddBlock"
+                class="com.localblocks.actions.AddBlockAction"
+                text="Create Draft Template"
+                description="Create a reusable Live Template draft">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
