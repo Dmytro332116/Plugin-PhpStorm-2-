@@ -1,7 +1,10 @@
 <idea-plugin>
     <id>com.localblocks.plugin</id>
-    <name>Local Blocks</name>
+    <name>Code Drafts</name>
     <vendor>Local</vendor>
+    <description>
+        Quick personal code drafts for PhpStorm. Save small code snippets once and reuse them instantly via Live Templates — no searching old projects or websites.
+    </description>
 
     <actions>
         <action id="LocalBlocks.AddBlock"
