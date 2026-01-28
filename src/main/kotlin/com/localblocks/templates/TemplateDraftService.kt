@@ -18,6 +18,7 @@ object TemplateDraftService {
         }
 
         val template = TemplateImpl(abbreviation, templateText, GROUP_NAME)
+        template.groupName = GROUP_NAME
         if (description.isNotBlank()) {
             template.description = description
         }
@@ -31,7 +32,9 @@ object TemplateDraftService {
 
     fun getUserDraftTemplates(): List<TemplateImpl> {
         val settings = TemplateSettings.getInstance()
-        return settings.getTemplates(GROUP_NAME).sortedBy { it.key }
+        return settings.getTemplatesAsList()
+            .filter { it.groupName == GROUP_NAME }
+            .sortedBy { it.key }
     }
 
     fun insertTemplate(project: Project, editor: Editor, template: TemplateImpl) {
