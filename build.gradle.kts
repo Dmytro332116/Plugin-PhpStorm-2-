@@ -38,6 +38,11 @@ tasks.named("buildSearchableOptions") {
     enabled = false
 }
 
+tasks.patchPluginXml {
+    sinceBuild.set("233")
+    untilBuild.set("253.*")
+}
+
 tasks.named<Zip>("buildPlugin") {
     archiveFileName.set("plugin-phpstorm-drafts-${project.version}.zip")
 }
