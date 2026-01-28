@@ -1,9 +1,8 @@
 <plugins>
   <plugin id="com.localblocks.plugin"
-          version="1.0.0"
-          url="https://dmytro332116.github.io/Plugin-PhpStorm-2-/plugin-phpstorm-drafts-1.0.0.zip">
+          url="https://dmytro332116.github.io/Plugin-PhpStorm-2-/plugin-phpstorm-drafts-1.0.0.zip"
+          version="1.0.0">
     <name>Local Blocks</name>
-    <vendor>Local</vendor>
-    <idea-version since-build="233.11799" until-build="233.*" />
+    <description>Personal draft/snippet library for PhpStorm.</description>
   </plugin>
 </plugins>
