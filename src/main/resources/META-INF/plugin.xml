@@ -10,5 +10,11 @@
                 description="Create a reusable Live Template draft">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
+        <action id="LocalBlocks.InsertDraft"
+                class="com.localblocks.actions.InsertDraftAction"
+                text="Insert Draft Template"
+                description="Insert a saved draft template into the editor">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
     </actions>
 </idea-plugin>

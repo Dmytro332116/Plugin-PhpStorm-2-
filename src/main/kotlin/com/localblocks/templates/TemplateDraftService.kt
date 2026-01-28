@@ -3,6 +3,9 @@ package com.localblocks.templates
 import com.intellij.codeInsight.template.impl.TemplateImpl
 import com.intellij.codeInsight.template.impl.TemplateSettings
 import com.intellij.codeInsight.template.impl.TemplateContextTypes
+import com.intellij.codeInsight.template.TemplateManager
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.Project
 
 object TemplateDraftService {
     private const val GROUP_NAME = "User Drafts"
@@ -24,6 +27,16 @@ object TemplateDraftService {
         resolveContexts(contexts, allContexts).forEach { template.templateContext.setEnabled(it, true) }
 
         settings.addTemplate(template)
+    }
+
+    fun getUserDraftTemplates(): List<TemplateImpl> {
+        val settings = TemplateSettings.getInstance()
+        return settings.getTemplates(GROUP_NAME).sortedBy { it.key }
+    }
+
+    fun insertTemplate(project: Project, editor: Editor, template: TemplateImpl) {
+        val manager = TemplateManager.getInstance(project)
+        manager.startTemplate(editor, template)
     }
 
     private fun resolveContexts(
