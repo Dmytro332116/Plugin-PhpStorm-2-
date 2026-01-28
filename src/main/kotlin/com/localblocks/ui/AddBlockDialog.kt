@@ -2,7 +2,8 @@ package com.localblocks.ui
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.DocumentAdapter
+import com.intellij.openapi.editor.event.DocumentEvent as EditorDocumentEvent
+import com.intellij.openapi.editor.event.DocumentListener as EditorDocumentListener
 import com.intellij.ui.EditorTextField
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
@@ -11,9 +12,9 @@ import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.GridLayout
 import javax.swing.JComponent
-import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 
 class AddBlockDialog(project: Project?) : DialogWrapper(project) {
     private val abbreviationField = JBTextField()
@@ -21,7 +22,7 @@ class AddBlockDialog(project: Project?) : DialogWrapper(project) {
     private val templateField = EditorTextField()
     private val contextChecks = linkedMapOf(
         "HTML" to JBCheckBox("HTML", true),
-        "JS" to JBCheckBox("JS", true),
+        "JavaScript" to JBCheckBox("JavaScript", true),
         "PHP" to JBCheckBox("PHP", true),
         "Twig" to JBCheckBox("Twig", true)
     )
@@ -30,13 +31,26 @@ class AddBlockDialog(project: Project?) : DialogWrapper(project) {
         title = "Create Draft Template"
         init()
         updateOkState()
-        val listener = object : DocumentAdapter() {
-            override fun textChanged(e: DocumentEvent) {
+        val textListener = object : DocumentListener {
+            override fun insertUpdate(e: DocumentEvent) {
+                updateOkState()
+            }
+
+            override fun removeUpdate(e: DocumentEvent) {
+                updateOkState()
+            }
+
+            override fun changedUpdate(e: DocumentEvent) {
                 updateOkState()
             }
         }
-        abbreviationField.document.addDocumentListener(listener)
-        templateField.document.addDocumentListener(listener)
+        val editorListener = object : EditorDocumentListener {
+            override fun documentChanged(event: EditorDocumentEvent) {
+                updateOkState()
+            }
+        }
+        abbreviationField.document.addDocumentListener(textListener)
+        templateField.document.addDocumentListener(editorListener)
     }
 
     fun getAbbreviation(): String = abbreviationField.text.trim()
@@ -56,10 +70,10 @@ class AddBlockDialog(project: Project?) : DialogWrapper(project) {
         contextPanel.add(contextList, BorderLayout.CENTER)
 
         return FormBuilder.createFormBuilder()
-            .addLabeledComponent(JLabel("Abbreviation"), abbreviationField)
-            .addLabeledComponent(JLabel("Description"), descriptionField)
-            .addLabeledComponentFillVertically(JLabel("Template Text"), templateField, 0)
-            .addLabeledComponent(JLabel("Context"), contextPanel)
+            .addLabeledComponent("Abbreviation", abbreviationField)
+            .addLabeledComponent("Description", descriptionField)
+            .addLabeledComponentFillVertically("Template Text", templateField)
+            .addLabeledComponent("Contexts", contextPanel)
             .panel
     }
 

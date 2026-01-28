@@ -1,8 +1,8 @@
 package com.localblocks.templates
 
-import com.intellij.codeInsight.template.TemplateContextType
-import com.intellij.codeInsight.template.TemplateSettings
 import com.intellij.codeInsight.template.impl.TemplateImpl
+import com.intellij.codeInsight.template.impl.TemplateSettings
+import com.intellij.codeInsight.template.impl.TemplateContextTypes
 
 object TemplateDraftService {
     private const val GROUP_NAME = "User Drafts"
@@ -11,7 +11,7 @@ object TemplateDraftService {
         val settings = TemplateSettings.getInstance()
         val existing = settings.getTemplate(abbreviation, GROUP_NAME)
         if (existing != null) {
-            settings.removeTemplate(existing, GROUP_NAME)
+            settings.removeTemplate(existing)
         }
 
         val template = TemplateImpl(abbreviation, templateText, GROUP_NAME)
@@ -19,29 +19,29 @@ object TemplateDraftService {
             template.description = description
         }
 
-        val allContexts = TemplateContextType.getAllContextTypes()
+        val allContexts = TemplateContextTypes.getAllContextTypes()
         allContexts.forEach { template.templateContext.setEnabled(it, false) }
         resolveContexts(contexts, allContexts).forEach { template.templateContext.setEnabled(it, true) }
 
-        settings.addTemplate(template, GROUP_NAME)
+        settings.addTemplate(template)
     }
 
     private fun resolveContexts(
         selected: Set<String>,
-        allContexts: List<TemplateContextType>
-    ): List<TemplateContextType> {
+        allContexts: List<com.intellij.codeInsight.template.TemplateContextType>
+    ): List<com.intellij.codeInsight.template.TemplateContextType> {
         if (selected.isEmpty()) return emptyList()
-        val byIdOrName: (String) -> TemplateContextType? = { token ->
+        val byIdOrName: (String) -> com.intellij.codeInsight.template.TemplateContextType? = { token ->
             allContexts.firstOrNull { ctx ->
                 ctx.contextId.equals(token, ignoreCase = true) ||
                     ctx.presentableName.equals(token, ignoreCase = true)
             }
         }
 
-        val resolved = mutableListOf<TemplateContextType>()
+        val resolved = mutableListOf<com.intellij.codeInsight.template.TemplateContextType>()
         val tokens = selected.flatMap { token ->
             when (token.uppercase()) {
-                "JS" -> listOf("JavaScript", "JS")
+                "JAVASCRIPT" -> listOf("JavaScript", "JS")
                 "HTML" -> listOf("HTML")
                 "PHP" -> listOf("PHP")
                 "TWIG" -> listOf("Twig")
