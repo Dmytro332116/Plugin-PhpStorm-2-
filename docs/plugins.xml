@@ -1,10 +1,10 @@
 <plugins>
   <plugin id="com.localblocks.plugin"
-          url="https://dmytro332116.github.io/Plugin-PhpStorm-2-/plugin-phpstorm-drafts-1.0.2.zip"
-          version="1.0.2">
+          url="https://dmytro332116.github.io/Plugin-PhpStorm-2-/plugin-phpstorm-drafts-1.0.3.zip"
+          version="1.0.3">
     <name>Code Drafts</name>
     <description>
-    Quick personal code drafts for PhpStorm. Save small code snippets once and reuse them instantly via Live Templates — no searching old projects or websites.
+    Personal code notebook for PhpStorm. Save your implementation notes (Twig, preprocess, JS) in one place and reuse them quickly.
     </description>
   </plugin>
 </plugins>
