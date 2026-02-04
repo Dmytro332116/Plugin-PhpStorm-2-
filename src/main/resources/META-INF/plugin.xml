@@ -2,22 +2,15 @@
     <id>com.localblocks.plugin</id>
     <name>Code Drafts</name>
     <vendor>Local</vendor>
+    <depends>com.intellij.modules.phpstorm</depends>
     <description>
-        Quick personal code drafts for PhpStorm. Save small code snippets once and reuse them instantly via Live Templates — no searching old projects or websites.
+        Personal code notebook for PhpStorm. Save your implementation notes (Twig, preprocess, JS) in one place and reuse them quickly.
     </description>
 
-    <actions>
-        <action id="LocalBlocks.AddBlock"
-                class="com.localblocks.actions.AddBlockAction"
-                text="Create Draft Template"
-                description="Create a reusable Live Template draft">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
-        <action id="LocalBlocks.InsertDraft"
-                class="com.localblocks.actions.InsertDraftAction"
-                text="Insert Draft Template"
-                description="Insert a saved draft template into the editor">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
-    </actions>
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="Code Drafts"
+                    anchor="right"
+                    factoryClass="com.localblocks.toolwindow.DraftsToolWindowFactory"
+                    icon="/icons/pluginIcon.svg"/>
+    </extensions>
 </idea-plugin>
