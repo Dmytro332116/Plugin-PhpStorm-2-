@@ -2,9 +2,17 @@ package com.localblocks.toolwindow
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.editor.event.DocumentEvent as EditorDocumentEvent
+import com.intellij.openapi.editor.event.DocumentListener as EditorDocumentListener
+import com.intellij.openapi.fileTypes.FileType
+import com.intellij.openapi.fileTypes.FileTypeManager
+import com.intellij.openapi.fileTypes.PlainTextFileType
+import com.intellij.openapi.fileTypes.UnknownFileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.IdeFocusManager
 import com.intellij.ui.DocumentAdapter
+import com.intellij.ui.EditorTextField
 import com.intellij.ui.OnePixelSplitter
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.SimpleListCellRenderer
@@ -35,11 +43,11 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
 
     private val titleField = JBTextField()
     private val twigTemplateField = JBTextField()
-    private val twigCodeArea = createCodeArea()
+    private val twigCodeArea = createCodeEditor(fileTypeForExtension("twig"), 160)
     private val preprocessLocationField = JBTextField()
-    private val preprocessCodeArea = createCodeArea()
+    private val preprocessCodeArea = createCodeEditor(fileTypeForExtension("php"), 160)
     private val jsLocationField = JBTextField()
-    private val jsCodeArea = createCodeArea()
+    private val jsCodeArea = createCodeEditor(fileTypeForExtension("js"), 160)
     private val generalNotesArea = createCodeArea(rows = 4)
 
     private val saveAlarm = Alarm(Alarm.ThreadToUse.SWING_THREAD, this)
@@ -159,11 +167,11 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
             list.repaint()
         }
         bind(twigTemplateField) { note, value -> note.twigTemplate = value }
-        bind(twigCodeArea) { note, value -> note.twigCode = value }
+        bindEditor(twigCodeArea) { note, value -> note.twigCode = value }
         bind(preprocessLocationField) { note, value -> note.preprocessLocation = value }
-        bind(preprocessCodeArea) { note, value -> note.preprocessCode = value }
+        bindEditor(preprocessCodeArea) { note, value -> note.preprocessCode = value }
         bind(jsLocationField) { note, value -> note.jsLocation = value }
-        bind(jsCodeArea) { note, value -> note.jsCode = value }
+        bindEditor(jsCodeArea) { note, value -> note.jsCode = value }
         bind(generalNotesArea) { note, value -> note.generalNotes = value }
     }
 
@@ -177,6 +185,18 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
                 scheduleSave()
             }
         })
+    }
+
+    private fun bindEditor(field: EditorTextField, updater: (DraftNote, String) -> Unit) {
+        field.document.addDocumentListener(object : EditorDocumentListener {
+            override fun documentChanged(event: EditorDocumentEvent) {
+                if (updating) return
+                val note = selectedNote ?: return
+                updater(note, field.text)
+                note.updatedAt = System.currentTimeMillis()
+                scheduleSave()
+            }
+        }, this)
     }
 
     private fun scheduleSave() {
@@ -197,14 +217,14 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
         return panel
     }
 
-    private fun section(title: String, locationField: JBTextField, codeArea: JBTextArea): JComponent {
+    private fun section(title: String, locationField: JBTextField, codeArea: JComponent): JComponent {
         val panel = JPanel(BorderLayout(0, JBUI.scale(6)))
         panel.border = JBUI.Borders.empty(6, 0)
         panel.add(JLabel(title), BorderLayout.NORTH)
 
         val inner = JPanel(BorderLayout(0, JBUI.scale(6)))
         inner.add(labeled("Location / File", locationField), BorderLayout.NORTH)
-        inner.add(wrap(codeArea, 160), BorderLayout.CENTER)
+        inner.add(codeArea, BorderLayout.CENTER)
         panel.add(inner, BorderLayout.CENTER)
         return panel
     }
@@ -215,6 +235,20 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
         }
     }
 
+    private fun createCodeEditor(fileType: FileType, height: Int): EditorTextField {
+        val document = EditorFactory.getInstance().createDocument("")
+        return EditorTextField(document, project, fileType, false, false).apply {
+            preferredSize = Dimension(480, JBUI.scale(height))
+            minimumSize = Dimension(480, JBUI.scale(height))
+            addSettingsProvider { editor ->
+                val settings = editor.settings
+                settings.isUseSoftWraps = true
+                settings.isLineNumbersShown = true
+                settings.isRightMarginShown = false
+            }
+        }
+    }
+
     private fun createCodeArea(rows: Int = 6): JBTextArea {
         return JBTextArea().apply {
             lineWrap = false
@@ -222,5 +256,10 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
             this.rows = rows
             font = JBFont.create(Font(Font.MONOSPACED, Font.PLAIN, 12))
         }
+    }
+
+    private fun fileTypeForExtension(extension: String): FileType {
+        val fileType = FileTypeManager.getInstance().getFileTypeByExtension(extension)
+        return if (fileType === UnknownFileType.INSTANCE) PlainTextFileType.INSTANCE else fileType
     }
 }
