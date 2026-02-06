@@ -53,6 +53,7 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
     private val jsLocationField = JBTextField()
     private val jsCodeArea = createCodeEditor(fileTypeForExtension("js"), 160)
     private val generalNotesArea = createCodeArea(rows = 4)
+    private val detailsScroll: JBScrollPane
 
     private val saveAlarm = Alarm(Alarm.ThreadToUse.SWING_THREAD, this)
 
@@ -92,14 +93,14 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
             add(labeled("General Notes", wrap(generalNotesArea, 120)))
         }
 
-        val rightPanel = JBScrollPane(detailsPanel).apply {
+        detailsScroll = JBScrollPane(detailsPanel).apply {
             border = JBUI.Borders.empty()
             preferredSize = Dimension(640, 520)
         }
 
         val splitter = OnePixelSplitter(false, 0.3f).apply {
             firstComponent = leftPanel
-            secondComponent = rightPanel
+            secondComponent = detailsScroll
         }
         add(splitter, BorderLayout.CENTER)
 
@@ -282,6 +283,7 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
 
     private fun resetEditorsToTop() {
         ApplicationManager.getApplication().invokeLater {
+            detailsScroll.verticalScrollBar.value = 0
             resetEditorScroll(twigCodeArea)
             resetEditorScroll(preprocessCodeArea)
             resetEditorScroll(jsCodeArea)
