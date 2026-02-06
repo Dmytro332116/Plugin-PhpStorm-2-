@@ -1,7 +1,7 @@
 <plugins>
   <plugin id="com.localblocks.plugin"
-          version="1.0.5"
-          url="https://dmytro332116.github.io/Plugin-PhpStorm-2-/plugin-phpstorm-drafts-1.0.5.zip">
+          version="1.0.6"
+          url="https://dmytro332116.github.io/Plugin-PhpStorm-2-/plugin-phpstorm-drafts-1.0.6.zip">
     <name>Code Drafts</name>
     <description><![CDATA[
 Personal code notebook for PhpStorm. Save your implementation notes (Twig, preprocess, JS) in one place and reuse them quickly.
