@@ -5,6 +5,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.event.DocumentEvent as EditorDocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener as EditorDocumentListener
+import com.intellij.openapi.editor.ScrollType
+import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.fileTypes.PlainTextFileType
@@ -28,11 +30,13 @@ import com.localblocks.storage.DraftStorage
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Font
+import java.awt.event.HierarchyEvent
 import javax.swing.DefaultListModel
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.ScrollPaneConstants
 import javax.swing.event.DocumentEvent
 import javax.swing.text.JTextComponent
 
@@ -99,6 +103,12 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
         }
         add(splitter, BorderLayout.CENTER)
 
+        addHierarchyListener { event ->
+            if ((event.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong()) != 0L && isShowing) {
+                resetEditorsToTop()
+            }
+        }
+
         bindFields()
         setFieldsEnabled(false)
 
@@ -137,6 +147,7 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
             setFieldsEnabled(true)
         }
         updating = false
+        resetEditorsToTop()
     }
 
     private fun clearFields() {
@@ -245,6 +256,12 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
                 settings.isUseSoftWraps = true
                 settings.isLineNumbersShown = true
                 settings.isRightMarginShown = false
+                if (editor is EditorEx) {
+                    editor.setVerticalScrollbarVisible(true)
+                    editor.setHorizontalScrollbarVisible(true)
+                    editor.scrollPane.verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
+                    editor.scrollPane.horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
+                }
             }
         }
     }
@@ -261,5 +278,21 @@ class DraftsToolWindowPanel(private val project: Project) : JPanel(BorderLayout(
     private fun fileTypeForExtension(extension: String): FileType {
         val fileType = FileTypeManager.getInstance().getFileTypeByExtension(extension)
         return if (fileType === UnknownFileType.INSTANCE) PlainTextFileType.INSTANCE else fileType
+    }
+
+    private fun resetEditorsToTop() {
+        ApplicationManager.getApplication().invokeLater {
+            resetEditorScroll(twigCodeArea)
+            resetEditorScroll(preprocessCodeArea)
+            resetEditorScroll(jsCodeArea)
+            generalNotesArea.caretPosition = 0
+            generalNotesArea.scrollRectToVisible(java.awt.Rectangle(0, 0, 1, 1))
+        }
+    }
+
+    private fun resetEditorScroll(field: EditorTextField) {
+        val editor = field.editor ?: return
+        editor.caretModel.moveToOffset(0)
+        editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
     }
 }
